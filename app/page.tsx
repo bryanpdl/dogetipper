@@ -14,7 +14,7 @@ export default function Component() {
 
   const shadowStyles = {
     dark: {
-      subtle: isPressed => isPressed
+      subtle: (isPressed: boolean) => isPressed
         ? "inset 3px 3px 12px rgba(0, 0, 0, 0.35), inset -3px -3px 12px rgba(255, 255, 255, 0.008)"
         : "8px 8px 32px rgba(0, 0, 0, 0.45), -8px -8px 32px rgba(255, 255, 255, 0.01), inset 1px 1px 1px rgba(255, 255, 255, 0.02)",
       pressed: "inset 4px 4px 16px rgba(0, 0, 0, 0.45), inset -4px -4px 16px rgba(255, 255, 255, 0.008), inset 1px 1px 1px rgba(255, 255, 255, 0.02)",
