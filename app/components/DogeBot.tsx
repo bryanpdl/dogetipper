@@ -24,9 +24,17 @@ export function DogeBot({ isDark, followDistance = 1 }: DogeBotProps) {
   const lastClickTime = useRef(Date.now())
   const clickCount = useRef(0)
   const [isIdle, setIsIdle] = useState(true)
-  const idleTargetRef = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
+  const idleTargetRef = useRef({ x: 0, y: 0 })
   const idleTimeoutRef = useRef<NodeJS.Timeout>()
   const lastIdleUpdateRef = useRef(Date.now())
+
+  // Initialize idle target position after mount
+  useEffect(() => {
+    idleTargetRef.current = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2
+    }
+  }, [])
 
   // Handle mouse movement with velocity-based reactions
   useEffect(() => {
