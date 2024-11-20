@@ -40,8 +40,7 @@ export function HomeView() {
   
   // Mock data - replace with real data later
   const walletData = {
-    balance: 18869.42,
-    usdValue: 0, // @ $0.1248 per DOGE
+    balance: 9434.73,
     stats: {
       sentPastDay: 150,
       receivedPastDay: 320,
@@ -188,122 +187,102 @@ export function HomeView() {
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {/* Wallet Balance Card */}
+    <div className="space-y-6">
+      {/* Balance Card */}
       <div className={cn(
-        "relative overflow-hidden rounded-[24px] sm:rounded-[32px] p-6 sm:p-8",
+        "relative overflow-hidden rounded-[24px] p-6 sm:p-8",
         "bg-gradient-to-br from-[#1c1c1c] to-[#1a1a1a]",
-        glossyOverlay,
-        "transition-all duration-300 hover:translate-y-[-2px]"
+        glossyOverlay
       )}
         style={{ boxShadow: shadowStyles.dark.outset }}
       >
-        {/* Live DOGE Price Tag */}
-        <div className={cn(
-          "absolute right-4 sm:right-8 top-4 sm:top-8 flex items-center gap-2 rounded-full px-3 py-1.5",
-          "bg-[#2a2a2a]/50 backdrop-blur-md",
-          "border border-[#3a3a3a]",
-          "animate-in fade-in duration-700"
-        )}>
-          {isLoading ? (
-            <div className="flex items-center gap-2 py-0.5">
-              <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
-              <span className="text-xs font-medium text-gray-400">
-                Loading...
-              </span>
-            </div>
-          ) : wsError ? (
-            <div className="flex items-center gap-2 py-0.5">
-              <span className="text-xs font-medium text-red-400">
-                Reconnecting...
-              </span>
-            </div>
-          ) : (
-            <>
-              <div className={cn(
-                "flex items-center gap-1.5",
-                priceData.trend === 'up' ? "text-green-400" : "text-red-400"
-              )}>
-                <TrendingUp className={cn(
-                  "h-3 w-3",
-                  priceData.trend === 'down' && "rotate-180",
-                  "transition-transform duration-300"
-                )} />
-                <span className="text-xs font-medium">
-                  {priceData.change.toFixed(2)}%
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-medium text-white mb-1">
+              Your Balance
+            </h2>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-white">
+                  Ð {walletData.balance.toLocaleString()}
+                </span>
+                <span className="text-sm text-gray-400">
+                  DOGE
                 </span>
               </div>
-              <div className="h-3 w-[1px] bg-[#3a3a3a]" />
-              <span className={cn(
-                "text-xs font-medium text-gray-300",
-                "transition-colors duration-300",
-                priceData.lastUpdate && Date.now() - priceData.lastUpdate.getTime() < 1000 && "text-blue-400"
-              )}>
-                ${priceData.current.toFixed(4)}
-              </span>
-            </>
-          )}
-        </div>
-
-        <div className="relative z-10">
-          <div className="mb-6">
-            <h2 className="mb-2 text-base sm:text-lg font-medium text-gray-400">Wallet Balance</h2>
-            <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
-              <span className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
-                Ð {walletData.balance.toLocaleString()}
-              </span>
-              <span className="text-base sm:text-lg font-medium text-gray-500">
-                ≈ ${calculateUsdValue(walletData.balance).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}
-              </span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-medium text-gray-400">
+                  ${(walletData.balance * priceData.current).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                </span>
+                <span className="text-sm text-gray-500">
+                  USD
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {/* Sent Today */}
-            <div className={cn(
-              "rounded-2xl p-4",
-              "bg-[#222222]",
-              "border border-[#3a3a3a]/30"
+          <div className="flex flex-wrap gap-2">
+            <NeumorphicButton
+              variant="secondary"
+              onClick={() => {/* handle send */}}
+              className="flex items-center gap-2"
+            >
+              <Send className="h-4 w-4" />
+              <span>Send</span>
+            </NeumorphicButton>
+
+            <NeumorphicButton
+              variant="secondary"
+              onClick={() => {/* handle receive */}}
+              className="flex items-center gap-2"
+            >
+              <QrCode className="h-4 w-4" />
+              <span>Receive</span>
+            </NeumorphicButton>
+          </div>
+        </div>
+
+        {/* Price Info */}
+        <div className="mt-6 flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-white">
+              ${priceData.current.toFixed(4)}
+            </span>
+            <span className={cn(
+              "flex items-center text-xs",
+              priceData.trend === 'up' ? "text-green-400" : "text-red-400"
             )}>
-              <div className="mb-1 flex items-center gap-2">
-                <ArrowUpRight className="h-4 w-4 text-blue-400" />
-                <span className="text-xs sm:text-sm font-medium text-gray-400">Sent (24h)</span>
-              </div>
-              <p className="text-base sm:text-lg font-semibold text-white">
+              <span>{priceData.change.toFixed(2)}%</span>
+              {priceData.trend === 'up' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownLeft className="h-3 w-3" />}
+            </span>
+          </div>
+          <div className="h-4 w-px bg-gray-800" />
+          <span className="text-xs text-gray-500">
+            Last updated {priceData.lastUpdate?.toLocaleTimeString()}
+          </span>
+        </div>
+
+        {/* Added Stats Section */}
+        <div className="mt-6 pt-6 border-t border-gray-800">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-sm text-gray-400 mb-1">Sent (24h)</p>
+              <p className="text-lg font-medium text-white">
                 Ð {walletData.stats.sentPastDay.toLocaleString()}
               </p>
             </div>
-
-            {/* Received Today */}
-            <div className={cn(
-              "rounded-2xl p-4",
-              "bg-[#222222]",
-              "border border-[#3a3a3a]/30"
-            )}>
-              <div className="mb-1 flex items-center gap-2">
-                <ArrowDownLeft className="h-4 w-4 text-green-400" />
-                <span className="text-xs sm:text-sm font-medium text-gray-400">Received (24h)</span>
-              </div>
-              <p className="text-base sm:text-lg font-semibold text-white">
+            <div>
+              <p className="text-sm text-gray-400 mb-1">Received (24h)</p>
+              <p className="text-lg font-medium text-white">
                 Ð {walletData.stats.receivedPastDay.toLocaleString()}
               </p>
             </div>
-
-            {/* Total Tips */}
-            <div className={cn(
-              "col-span-2 sm:col-span-1 rounded-2xl p-4",
-              "bg-[#222222]",
-              "border border-[#3a3a3a]/30"
-            )}>
-              <div className="mb-1 flex items-center gap-2">
-                <Wallet className="h-4 w-4 text-blue-400" />
-                <span className="text-xs sm:text-sm font-medium text-gray-400">Total Tips</span>
-              </div>
-              <p className="text-base sm:text-lg font-semibold text-white">
+            <div>
+              <p className="text-sm text-gray-400 mb-1">Total Tips</p>
+              <p className="text-lg font-medium text-white">
                 {walletData.stats.totalTips.toLocaleString()}
               </p>
             </div>
@@ -311,70 +290,41 @@ export function HomeView() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6">
-        <NeumorphicButton
-          className={cn(
-            "flex flex-col sm:flex-row items-center justify-center gap-2 py-3 sm:py-4 px-2 sm:px-4",
-            "hover:-translate-y-1 hover:shadow-[0_0_32px_rgba(59,130,246,0.2)]",
-            "active:translate-y-0"
-          )}
-          onClick={() => {}}
-        >
-          <QrCode className="h-5 w-5" />
-          <span className="text-xs sm:text-base">QR Code</span>
-        </NeumorphicButton>
-
-        <NeumorphicButton
-          className={cn(
-            "flex flex-col sm:flex-row items-center justify-center gap-2 py-3 sm:py-4 px-2 sm:px-4",
-            "hover:-translate-y-1",
-            "active:translate-y-0"
-          )}
-          onClick={handleCopyLink}
-        >
-          <Copy className="h-5 w-5" />
-          <span className="text-xs sm:text-base">
-            {copySuccess ? 'Copied!' : 'Copy Link'}
-          </span>
-        </NeumorphicButton>
-
-        {/* Send Tip Button - Full width on mobile */}
-        <NeumorphicButton
-          className={cn(
-            "col-span-2 sm:col-span-1",
-            "flex flex-col sm:flex-row items-center justify-center gap-2 py-3 sm:py-4 px-2 sm:px-4",
-            "hover:-translate-y-1",
-            "active:translate-y-0"
-          )}
-          onClick={() => {}}
-        >
-          <Send className="h-5 w-5" />
-          <span className="text-xs sm:text-base">Send Tip</span>
-        </NeumorphicButton>
-      </div>
-
       {/* Recent Activity */}
       <div className={cn(
-        "relative overflow-hidden rounded-[24px] sm:rounded-[32px] p-6 sm:p-8",
+        "relative overflow-hidden rounded-[24px] p-6 sm:p-8",
         "bg-gradient-to-br from-[#1c1c1c] to-[#1a1a1a]",
         glossyOverlay
       )}
         style={{ boxShadow: shadowStyles.dark.outset }}
       >
-        <h2 className="mb-4 sm:mb-6 text-lg sm:text-xl font-semibold text-white">Recent Activity</h2>
-        <div className="space-y-3 sm:space-y-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-medium text-white">Recent Activity</h2>
+          <NeumorphicButton
+            variant="secondary"
+            className="text-sm"
+            onClick={() => {/* handle view all */}}
+          >
+            View All
+          </NeumorphicButton>
+        </div>
+
+        <div className="space-y-4">
           {recentActivity.map((activity, index) => (
             <div
               key={index}
               className={cn(
-                "group relative overflow-hidden rounded-2xl p-4",
+                "group relative overflow-hidden rounded-xl p-4",
                 "bg-[#222222]",
                 glossyOverlay,
                 "transition-all duration-300",
-                "hover:bg-[#252525] hover:translate-y-[-2px]"
+                "hover:bg-[#252525] hover:-translate-y-0.5",
+                "animate-fadeIn"
               )}
-              style={{ boxShadow: shadowStyles.dark.subtle }}
+              style={{ 
+                boxShadow: shadowStyles.dark.subtle,
+                animationDelay: `${index * 100}ms`
+              }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
